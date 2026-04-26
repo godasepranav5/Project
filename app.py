@@ -8,10 +8,11 @@ CORS(app)
 # ─── DB CONFIG ─────────────────────────────────────────────
 # Change 'your_password' to your actual MySQL root password
 DB_CONFIG = {
-    "host":     "localhost",
-    "user":     "root",
-    "password": "Pranav@123",   # <── change this
-    "database": "college_db"
+    "host":     os.environ.get("${{RAILWAY_PRIVATE_DOMAIN}}", "localhost"),
+    "user":     os.environ.get("root", "root"),
+    "password": os.environ.get("${{MYSQL_ROOT_PASSWORD}}", "your_local_password"),
+    "database": os.environ.get("${{MYSQL_DATABASE}}", "college_db"),
+    "port":     int(os.environ.get("3306", 3306))
 }
 
 def get_db():
