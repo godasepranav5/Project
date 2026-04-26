@@ -4,16 +4,23 @@ from flask_cors import CORS
 import mysql.connector
 
 app = Flask(__name__)
+@app.errorhandler(500)
+def internal_error(e):
+    return jsonify({"error": str(e)}), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({"error": str(e)}), 500
 CORS(app)
 
 # ─── DB CONFIG ─────────────────────────────────────────────
 # Change 'your_password' to your actual MySQL root password
 DB_CONFIG = {
-    "host":     os.environ.get("${{RAILWAY_PRIVATE_DOMAIN}}", "localhost"),
-    "user":     os.environ.get("root", "root"),
-    "password": os.environ.get("${{MYSQL_ROOT_PASSWORD}}", "your_local_password"),
-    "database": os.environ.get("${{MYSQL_DATABASE}}", "college_db"),
-    "port":     int(os.environ.get("3306", 3306))
+    "host":     os.environ.get("MYSQLHOST", "localhost"),
+    "user":     os.environ.get("MYSQLUSER", "root"),
+    "password": os.environ.get("MYSQLPASSWORD", ""),
+    "database": os.environ.get("MYSQLDATABASE", "college_db"),
+    "port":     int(os.environ.get("MYSQLPORT", 3306))
 }
 
 def get_db():
