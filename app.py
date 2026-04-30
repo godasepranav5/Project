@@ -4,6 +4,7 @@ from flask_cors import CORS
 import mysql.connector
 
 app = Flask(__name__)
+
 @app.errorhandler(500)
 def internal_error(e):
     return jsonify({"error": str(e)}), 500
@@ -11,10 +12,10 @@ def internal_error(e):
 @app.errorhandler(Exception)
 def handle_exception(e):
     return jsonify({"error": str(e)}), 500
+
 CORS(app)
 
 # ─── DB CONFIG ─────────────────────────────────────────────
-# Change 'your_password' to your actual MySQL root password
 DB_CONFIG = {
     "host":     os.environ.get("MYSQLHOST", "localhost"),
     "user":     os.environ.get("MYSQLUSER", "root"),
@@ -162,6 +163,20 @@ def add_faculty():
     return jsonify({"message": "Faculty added"}), 201
 
 
+@app.route("/api/faculty/<fid>", methods=["PUT"])
+def update_faculty(fid):
+    d   = request.json
+    db  = get_db()
+    cur = db.cursor()
+    cur.execute(
+        "UPDATE faculty SET name=%s, dept=%s, designation=%s, email=%s WHERE faculty_id=%s",
+        (d["name"], d["dept"], d["designation"], d["email"], fid)
+    )
+    db.commit()
+    cur.close(); db.close()
+    return jsonify({"message": "Faculty updated"})
+
+
 @app.route("/api/faculty/<fid>", methods=["DELETE"])
 def delete_faculty(fid):
     db  = get_db()
@@ -173,7 +188,7 @@ def delete_faculty(fid):
 
 
 # ══════════════════════════════════════════════════════════
-#  COURSES
+#  COURSES  (kept for DB compatibility / stats)
 # ══════════════════════════════════════════════════════════
 
 @app.route("/api/courses", methods=["GET"])
